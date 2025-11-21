@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holiday Elegance</title>
+
+    <!-- WEBSITE ICON -->
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎄</text></svg>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #d4af37;
+            --deep-gold: #aa8c2c;
+            --black: #0a0a0a;
+            --dark-gray: #1a1a1a;
+            --light-gray: #e8e8e8;
+            --accent: #c41e3a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0a0a0a;
+            color: var(--light-gray);
+            font-family: 'Lato', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+
+        /* Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('./Images/background_snowman.png') no-repeat center center fixed;
+            background-size: cover;
+            background-color: #050505;
+            filter: blur(8px) brightness(0.4);
+            z-index: -1;
+            transform: scale(1.05);
+        }
+
+        /* --- Canvas --- */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        #starsCanvas {
+            z-index: 1;
+        }
+
+        #particlesCanvas {
+            z-index: 2;
+        }
+
+        #snowCanvas {
+            z-index: 3;
+        }
+
+        /* --- Welcome Screen --- */
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 10, 0.98);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            transition: opacity 1.5s ease, visibility 1.5s;
+            cursor: pointer;
+        }
+
+        .welcome-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .welcome-text {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 700;
+            color: var(--gold);
+            text-shadow: 0 0 30px var(--gold);
+            animation: glow-pulse 3s infinite;
+            text-align: center;
+        }
+
+        .click-hint {
+            position: absolute;
+            bottom: 40px;
+            font-size: 0.9rem;
+            color: var(--gold);
+            opacity: 0.5;
+            animation: bounce 2s infinite;
+        }
+
+        /* --- Animations --- */
+        @keyframes glow-pulse {
+
+            0%,
+            100% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
+
+        @keyframes expand {
+            from {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            to {
+                transform: scale(1.3);
+                opacity: 0;
+            }
+        }
+
+        @keyframes float-hint {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* --- Stage Container --- */
+        .stage-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 2.5s ease;
+        }
+
+        .stage-container.visible {
+            opacity: 1;
+        }
+
+        .content-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 90%;
+            max-width: 1400px;
+            height: 95%;
+            position: relative;
+            gap: 40px;
+            transition: all 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* --- LEFT COLUMN: Photo + Merry Christmas --- */
+        .artist-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 50;
+            flex-shrink: 0;
+            transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* STEP 2: Push Photo Far Left */
+        .content-wrapper.step-2 .artist-section {
+            transform: translateX(-40vw);
+        }
+
+        /* STEP 3: Return Photo to relative layout position */
+        .content-wrapper.step-3 .artist-section {
+            transform: translateX(0);
+        }
+
+        .photo-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 1.2s ease;
+            margin-bottom: 40px;
+        }
+
+        .photo-frame {
+            position: relative;
+            border: 3px solid var(--gold);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
+            overflow: hidden;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.95);
+            transition: all 0.4s ease;
+            aspect-ratio: 4/5;
+            width: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .photo-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 3s infinite;
+            pointer-events: none;
+        }
+
+        .photo-frame img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-frame:hover {
+            transform: scale(1.02);
+            border-color: #fff;
+        }
+
+        .glow-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            animation: expand 2s infinite;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .glow-ring:nth-child(1) {
+            width: 110%;
+            height: 110%;
+            animation-delay: 0s;
+        }
+
+        .glow-ring:nth-child(2) {
+            width: 120%;
+            height: 120%;
+            animation-delay: 0.4s;
+        }
+
+        .static-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.5rem, 5vw, 2.2rem);
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+            letter-spacing: 3px;
+        }
+
+        .static-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        /* --- RIGHT COLUMN: Interaction Area --- */
+        .interaction-area {
+            width: 0;
+            opacity: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: width 1.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.5s ease;
+            height: 100%;
+        }
+
+        .content-wrapper.step-2 .interaction-area {
+            opacity: 1;
+            pointer-events: auto;
+            overflow: visible;
+        }
+
+        .content-wrapper.step-3 .interaction-area {
+            width: 55%;
+            flex-grow: 1;
+            opacity: 1;
+            overflow: hidden;
+        }
+
+        /* KEVIN NAME */
+        .kevin-trigger {
+            cursor: pointer;
+            text-align: center;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: all 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+            position: relative;
+        }
+
+        /* STEP 2: Absolute Center */
+        .content-wrapper.step-2 .kevin-trigger {
+            position: fixed;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 1;
+            z-index: 100;
+        }
+
+        /* STEP 3: Top of Right Panel */
+        .content-wrapper.step-3 .kevin-trigger {
+            position: relative;
+            top: auto;
+            left: auto;
+            transform: none;
+            opacity: 1;
+            margin-top: 0;
+        }
+
+        .kevin-text {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2rem, 8vw, 4rem);
+            color: var(--gold);
+            text-shadow: 0 0 25px var(--gold);
+            letter-spacing: 4px;
+            line-height: 1;
+            animation: float-hint 3s infinite ease-in-out;
+            transition: transform 0.3s ease;
+        }
+
+        .kevin-trigger:hover .kevin-text {
+            transform: scale(1.05);
+        }
+
+        .kevin-subtitle {
+            font-size: 1rem;
+            color: var(--light-gray);
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 10px;
+            display: block;
+            transition: opacity 0.5s ease;
+        }
+
+        .content-wrapper.step-3 .kevin-subtitle {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* CONTENT PANEL */
+        .right-panel-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            opacity: 0;
+            transform: translateY(30px);
+            height: 0;
+            overflow: hidden;
+            transition: opacity 1s ease, transform 1s ease, height 1.5s ease;
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        .content-wrapper.step-3 .right-panel-content {
+            opacity: 1;
+            transform: translateY(0);
+            height: 100%;
+        }
+
+        /* --- INTERACTIVE BLOCK EXPANSION --- */
+        .playlist-container,
+        .video-section {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 80px;
+            transition: flex 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        .video-section .back-button {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .video-section.expanded .back-button {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Expansion States */
+        .video-section.expanded {
+            flex: 10;
+        }
+
+        .playlist-container.collapsed {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Reverse states */
+        .playlist-container.expanded {
+            flex: 10;
+        }
+
+        .video-section.collapsed {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .section-title {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 10px;
+            white-space: nowrap;
+        }
+
+        .playlist {
+            list-style: none;
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 5px;
+        }
+
+        .playlist li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        .playlist li:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateX(5px);
+        }
+
+        .playlist li.active {
+            background: rgba(212, 175, 55, 0.2);
+            border-left: 4px solid var(--gold);
+        }
+
+        .song-number {
+            color: var(--gold);
+            font-weight: 600;
+            margin-right: 12px;
+        }
+
+        .video-gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            height: 100%;
+            padding-right: 5px;
+        }
+
+        .video-item {
+            background: #000;
+            border: 1px solid var(--dark-gray);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 0 0 90%;
+            width: 100%;
+            scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            aspect-ratio: 3/4;
+        }
+
+        .video-item:hover {
+            border-color: var(--gold);
+        }
+
+        .video-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.8;
+        }
+
+        .video-item:hover img {
+            opacity: 1;
+        }
+
+        .play-overlay {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .play-icon {
+            font-size: 3rem;
+            color: var(--gold);
+        }
+
+        /* Audio Player */
+        .audio-player {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            max-width: 800px;
+            background: rgba(10, 10, 10, 0.95);
+            padding: 15px 30px;
+            border-radius: 60px;
+            border: 1px solid var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 150;
+            backdrop-filter: blur(15px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1s ease;
+            gap: 20px;
+        }
+
+        .audio-player.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .player-info {
+            flex: 1;
+            color: var(--gold);
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            font-size: clamp(0.75rem, 2vw, 1rem);
+        }
+
+        .player-controls button {
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-size: 1.3rem;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .progress-bar {
+            width: 100px;
+            height: 4px;
+            background: rgba(212, 175, 55, 0.2);
+            cursor: pointer;
+        }
+
+        .progress {
+            height: 100%;
+            background: var(--gold);
+            width: 0%;
+        }
+
+        .volume-slider {
+            width: 60px;
+            height: 4px;
+            background: rgba(212, 175, 55, 0.2);
+            border: none;
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gold);
+            cursor: pointer;
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gold);
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Video Modal */
+        .video-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .video-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .video-modal-content {
+            width: 90%;
+            max-width: 500px;
+            height: 80%;
+            position: relative;
+        }
+
+        .video-modal video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 2.5rem;
+            color: var(--gold);
+            cursor: pointer;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+            }
+
+            .welcome-text {
+                font-size: 2.5rem;
+            }
+
+            .content-wrapper {
+                flex-direction: column;
+                justify-content: flex-start;
+                padding-top: 20px;
+                gap: 10px;
+                overflow-y: auto;
+                height: auto;
+                min-height: 100%;
+                width: 95%;
+                max-width: 100%;
+                align-items: stretch;
+            }
+
+            .artist-section {
+                margin-bottom: 20px;
+                width: 100%;
+            }
+
+            .content-wrapper.step-2 .artist-section {
+                transform: translateY(-20px) scale(0.9) !important;
+                margin-bottom: 40px;
+            }
+
+            .content-wrapper.step-3 .artist-section {
+                transform: scale(0.85) !important;
+                margin-bottom: 30px;
+            }
+
+            .photo-frame {
+                width: 180px;
+                height: 225px;
+            }
+
+            .static-title {
+                font-size: 1.6rem;
+            }
+
+            .interaction-area {
+                width: 100% !important;
+                opacity: 1;
+                height: auto;
+                overflow: visible;
+            }
+
+            .content-wrapper.step-2 .kevin-trigger {
+                position: relative !important;
+                top: auto !important;
+                left: auto !important;
+                transform: none !important;
+                opacity: 1 !important;
+                margin-top: 20px;
+                margin-bottom: 25px;
+            }
+
+            .kevin-text {
+                font-size: 2rem;
+                letter-spacing: 2px;
+            }
+
+            .right-panel-content {
+                height: auto !important;
+                margin-bottom: 120px;
+                gap: 15px;
+            }
+
+            .playlist-container,
+            .video-section {
+                min-height: 200px;
+                flex: 1 !important;
+                padding: 15px;
+                overflow: hidden;
+            }
+
+            .section-title {
+                font-size: 1rem;
+                margin-bottom: 10px;
+            }
+
+            .video-gallery {
+                flex-direction: row;
+                scroll-snap-type: x mandatory;
+                overflow-x: auto;
+                overflow-y: hidden;
+                height: 220px;
+                gap: 10px;
+                padding-right: 0;
+            }
+
+            .video-section.expanded .video-gallery {
+                flex-direction: column;
+                scroll-snap-type: y mandatory;
+                height: 100%;
+                overflow-x: hidden;
+                overflow-y: auto;
+                gap: 15px;
+            }
+
+            .video-item {
+                flex: 0 0 160px;
+                width: 160px;
+                height: 100%;
+                aspect-ratio: auto;
+                min-height: 200px;
+            }
+
+            .video-section.expanded .video-item {
+                flex: 0 0 auto;
+                width: 100%;
+                height: auto;
+                aspect-ratio: 3/4;
+                min-height: 250px;
+            }
+
+            .playlist {
+                max-height: 200px;
+            }
+
+            .audio-player {
+                width: 90%;
+                bottom: 10px;
+                padding: 12px 15px;
+                gap: 10px;
+                border-radius: 40px;
+            }
+
+            .player-info {
+                font-size: 0.8rem;
+            }
+
+            .player-controls button {
+                font-size: 1.1rem;
+                margin: 0 3px;
+            }
+
+            .progress-bar {
+                width: 60px;
+                display: none;
+            }
+
+            .close-modal {
+                top: 15px;
+                right: 20px;
+                font-size: 2rem;
+            }
+
+            .back-button {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .welcome-text {
+                font-size: 2rem;
+            }
+
+            .kevin-text {
+                font-size: 1.5rem;
+            }
+
+            .static-title {
+                font-size: 1.4rem;
+                letter-spacing: 2px;
+            }
+
+            .photo-frame {
+                width: 150px;
+                height: 190px;
+            }
+
+            .playlist-container,
+            .video-section {
+                min-height: 180px;
+                padding: 12px;
+            }
+
+            .section-title {
+                font-size: 0.95rem;
+            }
+
+            .video-item {
+                flex: 0 0 140px;
+                width: 140px;
+                min-height: 180px;
+            }
+
+            .video-section.expanded .video-item {
+                min-height: 220px;
+            }
+
+            .audio-player {
+                bottom: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Effects -->
+    <canvas id="starsCanvas"></canvas>
+    <canvas id="particlesCanvas"></canvas>
+    <canvas id="snowCanvas"></canvas>
+
+    <!-- Welcome -->
+    <div id="welcomeScreen" class="welcome-screen">
+        <h1 class="welcome-text">✨YOUR SURPRISE IS WAITING✨</h1>
+        <p class="click-hint">Click to Begin</p>
+    </div>
+
+    <!-- Main Stage -->
+    <div class="stage-container" id="stageContainer">
+        <div class="content-wrapper" id="contentWrapper">
+
+            <!-- LEFT COLUMN: Photo & Merry Christmas -->
+            <div class="artist-section">
+                <!-- 1. Photo (Tap triggers Slide Left & Kevin Reveal) -->
+                <div class="photo-container" id="photoTrigger">
+                    <div class="glow-ring"></div>
+                    <div class="glow-ring"></div>
+                    <div class="photo-frame">
+                        <img src="/Images/photo.jpg" alt="Holiday">
+                    </div>
+                </div>
+                <!-- 2. Static Title (Moves with Photo) -->
+                <div class="title-group">
+                    <h1 class="static-title">MERRY CHRISTMAS</h1>
+                    <p class="static-subtitle">A Gift of Joy</p>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Kevin & Content -->
+            <div class="interaction-area">
+
+                <!-- 3. KEVIN (Reveals on Step 2, Tap triggers Content) -->
+                <div class="kevin-trigger" id="kevinTrigger">
+                    <h1 class="kevin-text">ALLREX_REYVANTH</h1>
+                    <span class="kevin-subtitle">Tap to Open Memories</span>
+                </div>
+
+                <!-- 4. CONTENT (Reveals on Step 3) -->
+                <div class="right-panel-content">
+                    <div class="playlist-container" id="playlistBlock">
+                        <h2 class="section-title">🎵 REX Playlist</h2>
+                        <ul class="playlist" id="playlist">
+                            <li data-src="./Audio/1.mp3" data-title="Silent Night">
+                                <span class="song-number">01</span> <span class="song-title">SONG 1</span>
+                            </li>
+                            <li data-src="./Audio/2.mp3" data-title="Jingle Bells">
+                                <span class="song-number">02</span> <span class="song-title">SONG 2</span>
+                            </li>
+                            <li data-src="./Audio/3.mp3" data-title="Winter Wonderland">
+                                <span class="song-number">03</span> <span class="song-title">SONG 3</span>
+                            </li>
+                            <li data-src="./Audio/4.mp3" data-title="Deck the Halls">
+                                <span class="song-number">04</span> <span class="song-title">SONG 4</span>
+                            </li>
+                            <li data-src="./Audio/5.mp3" data-title="Frosty the Snowman">
+                                <span class="song-number">05</span> <span class="song-title">SONG 5</span>
+                            </li>
+                            <li data-src="./Audio/6.mp3" data-title="Carol">
+                                <span class="song-number">06</span> <span class="song-title">SONG 6</span>
+                            </li>
+                            <li data-src="./Audio/7.mp3" data-title="Sleigh Ride">
+                                <span class="song-number">07</span> <span class="song-title">SONG 7</span>
+                            </li>
+                            <li data-src="./Audio/8.mp3" data-title="Sleigh Ride">
+                                <span class="song-number">08</span> <span class="song-title">SONG 8</span>
+                            </li>
+                            <li data-src="./Audio/9.mp3" data-title="Sleigh Ride">
+                                <span class="song-number">09</span> <span class="song-title">SONG 9</span>
+                            </li>
+                            <li data-src="./Audio/11.mp3" data-title="Sleigh Ride">
+                                <span class="song-number">11</span> <span class="song-title">SONG 11</span>
+                            </li>
+                            <li data-src="./Audio/12.mp3" data-title="Sleigh Ride">
+                                <span class="song-number">12</span> <span class="song-title">SONG 12</span>
+                            </li>
+                            <li data-src="./Audio/13.mp3" data-title="Sleigh Ride">
+                                <span class="song-number">13</span> <span class="song-title">SONG 13</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="video-section" id="reelsBlock">
+                        <button class="back-button" id="backBtn">✕</button>
+                        <h2 class="section-title">🎬 REX's Reels</h2>
+                        <div class="video-gallery">
+                            <div class="video-item" data-video="./Videos/1.mp4">
+                                <img src="./Images/thumnails.jpg" alt="Reel">
+                                <div class="play-overlay"><span class="play-icon">▶</span></div>
+                            </div>
+                            <div class="video-item" data-video="./Videos/2.mp4">
+                                <img src="./Images/thumnails.jpg" alt="Reel">
+                                <div class="play-overlay"><span class="play-icon">▶</span></div>
+                            </div>
+                            <div class="video-item" data-video="./Videos/3.mp4">
+                                <img src="./Images/thumnails.jpg" alt="Reel">
+                                <div class="play-overlay"><span class="play-icon">▶</span></div>
+                            </div>
+                            <div class="video-item" data-video="./Videos/4.mp4">
+                                <img src="./Images/thumnails.jpg" alt="Reel">
+                                <div class="play-overlay"><span class="play-icon">▶</span></div>
+                            </div>
+                            <div class="video-item" data-video="./Videos/5.mp4">
+                                <img src="./Images/thumnails.jpg" alt="Reel">
+                                <div class="play-overlay"><span class="play-icon">▶</span></div>
+                            </div>
+                            <div class="video-item" data-video="./Videos/6.mp4">
+                                <img src="./Images/thumnails.jpg" alt="Reel">
+                                <div class="play-overlay"><span class="play-icon">▶</span></div>
+                            </div>
+                            <div class="video-item" data-video="./Videos/7.mp4">
+                                <img src="./Images/thumnails.jpg" alt="Reel">
+                                <div class="play-overlay"><span class="play-icon">▶</span></div>
+                            </div>
+                            <div class="video-item" data-video="./Videos/8.mp4">
+                                <img src="./Images/thumnails.jpg" alt="Reel">
+                                <div class="play-overlay"><span class="play-icon">▶</span></div>    
+                            </div>      
+                            <div class="video-item" data-video="./Videos/9.mp4"> 
+                                <img src="./Images/thumnails.jpg" alt="Reel">
+                                <div class="play-overlay"><span class="play-icon">▶</span></div>
+                            </div>
+                            <div class="video-item" data-video="./Videos/10.mp4">
+                                <img src="./Images/thumnails.jpg" alt="Reel">
+                                <div class="play-overlay"><span class="play-icon">▶</span></div>
+                            </div>
+                            <div class="video-item" data-video="./Videos/11.mp4">
+                                <img src="./Images/thumnails.jpg" alt="Reel">
+                                <div class="play-overlay"><span class="play-icon">▶</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Audio Player -->
+        <div class="audio-player" id="audioPlayer">
+            <div class="player-info"><span id="currentSong">Select a song...</span></div>
+            <div class="player-controls">
+                <button id="prevBtn">⏮</button> <button id="playBtn">▶</button> <button id="nextBtn">⏭</button>
+            </div>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <input type="range" id="volumeControl" min="0" max="100" value="70" class="volume-slider">
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div class="video-modal" id="videoModal">
+        <span class="close-modal" id="closeModal">✕</span>
+        <div class="video-modal-content">
+            <video id="modalVideo" controls>
+                <source src="" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Visual Effects ---
+            const setupCanvas = (id) => {
+                const c = document.getElementById(id);
+                const ctx = c.getContext('2d');
+                c.width = window.innerWidth;
+                c.height = window.innerHeight;
+                return { c, ctx, w: c.width, h: c.height };
+            }
+
+            const snow = setupCanvas('snowCanvas');
+            const flakes = Array.from({ length: 150 }, () => ({
+                x: Math.random() * snow.w,
+                y: Math.random() * snow.h,
+                r: Math.random() * 3 + 1,
+                s: Math.random() * 1 + 0.5
+            }));
+
+            function drawSnow() {
+                snow.ctx.clearRect(0, 0, snow.w, snow.h);
+                snow.ctx.fillStyle = "rgba(255,255,255,0.8)";
+                snow.ctx.beginPath();
+                flakes.forEach(f => {
+                    snow.ctx.moveTo(f.x, f.y);
+                    snow.ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+                    f.y += f.s;
+                    if (f.y > snow.h) f.y = 0;
+                });
+                snow.ctx.fill();
+                requestAnimationFrame(drawSnow);
+            }
+            drawSnow();
+
+            const pC = document.getElementById('particlesCanvas');
+            const pCtx = pC.getContext('2d');
+            pC.width = window.innerWidth;
+            pC.height = window.innerHeight;
+            let particles = [];
+
+            function createBurst(x, y) {
+                for (let i = 0; i < 20; i++) {
+                    particles.push({
+                        x,
+                        y,
+                        vx: Math.random() * 4 - 2,
+                        vy: Math.random() * 4 - 2,
+                        a: 1
+                    });
+                }
+            }
+
+            function drawParticles() {
+                pCtx.clearRect(0, 0, pC.width, pC.height);
+                particles.forEach((p, i) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.a -= 0.02;
+                    pCtx.fillStyle = `rgba(212,175,55,${p.a})`;
+                    pCtx.fillRect(p.x, p.y, 3, 3);
+                    if (p.a <= 0) particles.splice(i, 1);
+                });
+                requestAnimationFrame(drawParticles);
+            }
+            drawParticles();
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                snow.c.width = window.innerWidth;
+                snow.c.height = window.innerHeight;
+                pC.width = window.innerWidth;
+                pC.height = window.innerHeight;
+            });
+
+            // --- Interaction Flow ---
+            const contentWrapper = document.getElementById('contentWrapper');
+            const photoTrigger = document.getElementById('photoTrigger');
+            const kevinTrigger = document.getElementById('kevinTrigger');
+
+            // 1. Start
+            document.getElementById('welcomeScreen').addEventListener('click', function () {
+                this.classList.add('hidden');
+                document.getElementById('stageContainer').classList.add('visible');
+            });
+
+            // 2. Tap Photo -> Both Move Left, Kevin Reveals on Right
+            photoTrigger.addEventListener('click', (e) => {
+                if (!contentWrapper.classList.contains('step-2')) {
+                    contentWrapper.classList.add('step-2');
+                    const rect = photoTrigger.getBoundingClientRect();
+                    createBurst(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                    e.stopPropagation();
+                }
+            });
+
+            // 3. Tap KEVIN -> Content Reveals
+            kevinTrigger.addEventListener('click', (e) => {
+                if (contentWrapper.classList.contains('step-2') && !contentWrapper.classList.contains('step-3')) {
+                    contentWrapper.classList.add('step-3');
+                    document.getElementById('audioPlayer').classList.add('visible');
+                    const rect = kevinTrigger.getBoundingClientRect();
+                    createBurst(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                    e.stopPropagation();
+                }
+            });
+
+            // --- BLOCK EXPANSION LOGIC ---
+            const playlistBlock = document.getElementById('playlistBlock');
+            const reelsBlock = document.getElementById('reelsBlock');
+            const backBtn = document.getElementById('backBtn');
+
+            // Expand Reels on click
+            reelsBlock.addEventListener('click', (e) => {
+                if (!e.target.closest('.play-overlay') && !e.target.closest('.back-button')) {
+                    reelsBlock.classList.add('expanded');
+                    reelsBlock.classList.remove('collapsed');
+                    playlistBlock.classList.add('collapsed');
+                    playlistBlock.classList.remove('expanded');
+                }
+            });
+
+            // Back button to collapse reels
+            backBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                reelsBlock.classList.remove('expanded');
+                reelsBlock.classList.remove('collapsed');
+                playlistBlock.classList.remove('collapsed');
+                playlistBlock.classList.remove('expanded');
+            });
+
+            // Reset view or Expand Playlist on click
+            playlistBlock.addEventListener('click', (e) => {
+                // Don't trigger on song clicks
+                if (!e.target.closest('.playlist li')) return;
+
+                if (reelsBlock.classList.contains('expanded')) {
+                    reelsBlock.classList.remove('expanded');
+                    playlistBlock.classList.remove('collapsed');
+                } else {
+                    playlistBlock.classList.add('expanded');
+                    reelsBlock.classList.add('collapsed');
+                }
+            });
+
+            // --- Media Logic ---
+            const audio = new Audio();
+            const playlistItems = document.querySelectorAll('.playlist li');
+            const playBtn = document.getElementById('playBtn');
+            const modal = document.getElementById('videoModal');
+            const modalVideo = document.getElementById('modalVideo');
+
+            // Audio
+            function loadSong(idx) {
+                const item = playlistItems[idx];
+                audio.src = item.dataset.src;
+                document.getElementById('currentSong').textContent = item.dataset.title;
+                playlistItems.forEach(li => li.classList.remove('active'));
+                item.classList.add('active');
+                currentSongIdx = idx;
+            }
+
+            let currentSongIdx = 0;
+
+            playBtn.addEventListener('click', () => {
+                if (!audio.src && playlistItems.length) loadSong(0);
+                if (audio.paused) {
+                    audio.play();
+                    playBtn.textContent = '⏸';
+                } else {
+                    audio.pause();
+                    playBtn.textContent = '▶';
+                }
+            });
+
+            document.getElementById('nextBtn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                currentSongIdx = (currentSongIdx + 1) % playlistItems.length;
+                loadSong(currentSongIdx);
+                audio.play();
+                playBtn.textContent = '⏸';
+            });
+
+            document.getElementById('prevBtn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                currentSongIdx = (currentSongIdx - 1 + playlistItems.length) % playlistItems.length;
+                loadSong(currentSongIdx);
+                audio.play();
+                playBtn.textContent = '⏸';
+            });
+
+            playlistItems.forEach((li, idx) => {
+                li.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    loadSong(idx);
+                    audio.play();
+                    playBtn.textContent = '⏸';
+                });
+            });
+
+            // Update progress bar
+            audio.addEventListener('timeupdate', () => {
+                if (audio.duration) {
+                    const percent = (audio.currentTime / audio.duration) * 100;
+                    document.getElementById('progress').style.width = percent + '%';
+                }
+            });
+
+            // Click on progress bar to seek
+            document.querySelector('.progress-bar').addEventListener('click', (e) => {
+                const bar = document.querySelector('.progress-bar');
+                const rect = bar.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                audio.currentTime = percent * audio.duration;
+            });
+
+            // Auto play next song when current ends
+            audio.addEventListener('ended', () => {
+                currentSongIdx = (currentSongIdx + 1) % playlistItems.length;
+                loadSong(currentSongIdx);
+                audio.play();
+            });
+
+            // Volume control
+            const volumeControl = document.getElementById('volumeControl');
+            audio.volume = 0.7;
+            volumeControl.addEventListener('input', (e) => {
+                audio.volume = e.target.value / 100;
+            });
+
+            // Video
+            document.querySelectorAll('.video-item').forEach(v => {
+                v.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    modalVideo.src = v.dataset.video;
+                    modal.classList.add('active');
+                    modalVideo.play().catch(() => { });
+                });
+            });
+
+            document.getElementById('closeModal').addEventListener('click', () => {
+                modal.classList.remove('active');
+                modalVideo.pause();
+            });
+
+            // Close modal on background click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                    modalVideo.pause();
+                }
+            });
+        });
+    </script>
+    </body>
+
+</html>
