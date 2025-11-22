@@ -122,7 +122,6 @@
 
         /* --- Animations --- */
         @keyframes glow-pulse {
-
             0%,
             100% {
                 opacity: 0.7;
@@ -136,7 +135,6 @@
         }
 
         @keyframes bounce {
-
             0%,
             100% {
                 transform: translateY(0);
@@ -170,7 +168,6 @@
         }
 
         @keyframes float-hint {
-
             0%,
             100% {
                 transform: translateY(0);
@@ -178,6 +175,44 @@
 
             50% {
                 transform: translateY(-5px);
+            }
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes vinyl-glow {
+            0% {
+                box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 40px rgba(212, 175, 55, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(212, 175, 55, 0.6), inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 60px rgba(212, 175, 55, 0.4);
+            }
+            100% {
+                box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 40px rgba(212, 175, 55, 0.2);
+            }
+        }
+
+        @keyframes record-rings {
+            0% {
+                box-shadow: 
+                    inset 0 0 0 2px rgba(212, 175, 55, 0.3),
+                    inset 0 0 0 8px rgba(0, 0, 0, 0.9),
+                    inset 0 0 0 14px rgba(212, 175, 55, 0.2),
+                    inset 0 0 0 20px rgba(0, 0, 0, 0.95);
+            }
+            100% {
+                box-shadow: 
+                    inset 0 0 0 2px rgba(212, 175, 55, 0.3),
+                    inset 0 0 0 8px rgba(0, 0, 0, 0.9),
+                    inset 0 0 0 14px rgba(212, 175, 55, 0.2),
+                    inset 0 0 0 20px rgba(0, 0, 0, 0.95);
             }
         }
 
@@ -236,9 +271,12 @@
             position: relative;
             display: flex;
             justify-content: center;
+            align-items: center;
             cursor: pointer;
             transition: transform 1.2s ease;
             margin-bottom: 40px;
+            width: 360px;
+            height: 360px;
         }
 
         .photo-frame {
@@ -248,13 +286,29 @@
             overflow: hidden;
             border-radius: 8px;
             background: rgba(0, 0, 0, 0.95);
-            transition: all 0.4s ease;
+            transition: all 0.8s ease;
             aspect-ratio: 4/5;
             width: 320px;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 10;
+        }
+
+        /* Vinyl Record Style */
+        .photo-frame.playing {
+            border-radius: 50%;
+            width: 320px;
+            height: 320px;
+            aspect-ratio: 1;
+            box-shadow: 
+                0 0 50px rgba(212, 175, 55, 0.6),
+                inset 0 0 0 2px rgba(212, 175, 55, 0.3),
+                inset 0 0 0 8px rgba(0, 0, 0, 0.9),
+                inset 0 0 0 14px rgba(212, 175, 55, 0.2),
+                inset 0 0 0 20px rgba(0, 0, 0, 0.95);
+            animation: spin 3s linear infinite, vinyl-glow 2s ease-in-out infinite;
+            border: 8px solid var(--gold);
         }
 
         .photo-frame::before {
@@ -303,6 +357,39 @@
             width: 120%;
             height: 120%;
             animation-delay: 0.4s;
+        }
+
+        /* Vinyl Center Label */
+        .vinyl-label {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, var(--gold), var(--deep-gold));
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .vinyl-label.visible {
+            opacity: 1;
+        }
+
+        .vinyl-label::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #000;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .static-title {
@@ -405,6 +492,26 @@
         .content-wrapper.step-3 .kevin-subtitle {
             opacity: 0;
             pointer-events: none;
+        }
+
+        /* Greeting Text Fade */
+        .greeting-text {
+            font-size: 1.1rem;
+            color: var(--light-gray);
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 20px auto;
+            transition: opacity 0.8s ease, max-height 0.8s ease, margin 0.8s ease;
+            max-height: 500px;
+            opacity: 1;
+        }
+
+        .content-wrapper.step-3 .greeting-text {
+            opacity: 0;
+            max-height: 0;
+            margin: 0 auto;
+            pointer-events: none;
+            overflow: hidden;
         }
 
         /* CONTENT PANEL */
@@ -768,6 +875,16 @@
                 height: 225px;
             }
 
+            .photo-frame.playing {
+                width: 180px;
+                height: 180px;
+            }
+
+            .photo-container {
+                width: 200px;
+                height: 200px;
+            }
+
             .static-title {
                 font-size: 1.6rem;
             }
@@ -904,6 +1021,16 @@
                 height: 190px;
             }
 
+            .photo-frame.playing {
+                width: 150px;
+                height: 150px;
+            }
+
+            .photo-container {
+                width: 180px;
+                height: 180px;
+            }
+
             .playlist-container,
             .video-section {
                 min-height: 180px;
@@ -953,9 +1080,10 @@
                 <div class="photo-container" id="photoTrigger">
                     <div class="glow-ring"></div>
                     <div class="glow-ring"></div>
-                    <div class="photo-frame">
-                        <img src="/Images/photo.jpg" alt="Holiday">
+                    <div class="photo-frame" id="photoFrame">
+                        <img src="/Images/profile" alt="Holiday">
                     </div>
+                    <div class="vinyl-label" id="vinylLabel"></div>
                 </div>
                 <!-- 2. Static Title (Moves with Photo) -->
                 <div class="title-group">
@@ -970,6 +1098,19 @@
                 <!-- 3. KEVIN (Reveals on Step 2, Tap triggers Content) -->
                 <div class="kevin-trigger" id="kevinTrigger">
                     <h1 class="kevin-text">ALLREX_REYVANTH</h1>
+                    <div class="greeting-text">
+                        <p><strong>Merry Christmas, Chris!</strong></p>
+
+                        <p>Even though we don't talk very often, I truly appreciate the calm and positive energy you bring
+                        wherever you go. <br>You have a gentle way of making the atmosphere feel lighter, and it never goes
+                        unnoticed.<br> Your singing adds a special charm — it's inspiring to see you express your talent so
+                        quietly yet so beautifully.</p>
+
+                        <p>As the Christmas season arrives, I want to send you a heartfelt wish for joy, peace, and
+                        moments that make you smile. <br>May this time surround you with warmth, good memories, and
+                        everything that keeps your heart happy. <br>Keep being the kind, humble person you are, and may the
+                        coming year bring you more success, inspiration, and <br>beautiful melodies.</p>
+                    </div>
                     <span class="kevin-subtitle">Tap to Open Memories</span>
                 </div>
 
@@ -1051,9 +1192,9 @@
                             </div>
                             <div class="video-item" data-video="./Video/8.mp4">
                                 <img src="./Images/thumnails.jpg" alt="Reel">
-                                <div class="play-overlay"><span class="play-icon">▶</span></div>    
-                            </div>      
-                            <div class="video-item" data-video="./Video/9.mp4"> 
+                                <div class="play-overlay"><span class="play-icon">▶</span></div>
+                            </div>
+                            <div class="video-item" data-video="./Video/9.mp4">
                                 <img src="./Images/thumnails.jpg" alt="Reel">
                                 <div class="play-overlay"><span class="play-icon">▶</span></div>
                             </div>
@@ -1173,6 +1314,8 @@
             const contentWrapper = document.getElementById('contentWrapper');
             const photoTrigger = document.getElementById('photoTrigger');
             const kevinTrigger = document.getElementById('kevinTrigger');
+            const photoFrame = document.getElementById('photoFrame');
+            const vinylLabel = document.getElementById('vinylLabel');
 
             // 1. Start
             document.getElementById('welcomeScreen').addEventListener('click', function () {
@@ -1263,9 +1406,15 @@
                 if (audio.paused) {
                     audio.play();
                     playBtn.textContent = '⏸';
+                    // Enable vinyl effect
+                    photoFrame.classList.add('playing');
+                    vinylLabel.classList.add('visible');
                 } else {
                     audio.pause();
                     playBtn.textContent = '▶';
+                    // Disable vinyl effect - smooth transition back
+                    photoFrame.classList.remove('playing');
+                    vinylLabel.classList.remove('visible');
                 }
             });
 
@@ -1275,6 +1424,9 @@
                 loadSong(currentSongIdx);
                 audio.play();
                 playBtn.textContent = '⏸';
+                // Enable vinyl effect
+                photoFrame.classList.add('playing');
+                vinylLabel.classList.add('visible');
             });
 
             document.getElementById('prevBtn').addEventListener('click', (e) => {
@@ -1283,6 +1435,9 @@
                 loadSong(currentSongIdx);
                 audio.play();
                 playBtn.textContent = '⏸';
+                // Enable vinyl effect
+                photoFrame.classList.add('playing');
+                vinylLabel.classList.add('visible');
             });
 
             playlistItems.forEach((li, idx) => {
@@ -1291,6 +1446,9 @@
                     loadSong(idx);
                     audio.play();
                     playBtn.textContent = '⏸';
+                    // Enable vinyl effect
+                    photoFrame.classList.add('playing');
+                    vinylLabel.classList.add('visible');
                 });
             });
 
@@ -1348,6 +1506,6 @@
             });
         });
     </script>
-    </body>
+</body>
 
 </html>
