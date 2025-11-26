@@ -810,16 +810,42 @@
             cursor: pointer;
         }
 
-        /* Santa Animation */
+        /* Santa + Reindeer Animation */
         .santa {
-            width: 20vw;
-            min-width: 175px;
             z-index: 600;
             cursor: pointer;
             animation: FlyingSanta 38s infinite linear;
             bottom: 0%;
             left: 0%;
             position: fixed;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            font-size: clamp(20px, 2.5vw, 56px);
+        }
+
+        .santa .reindeer {
+            transform-origin: center;
+            animation: reindeer-gallop 0.6s ease-in-out infinite;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+        }
+
+        .santa .reindeer.r1 { transform: translateY(0) translateX(0) scale(0.95); }
+        .santa .reindeer.r2 { transform: translateY(0) translateX(0) scale(0.97); }
+        .santa .reindeer.r3 { transform: translateY(0) translateX(0) scale(0.99); }
+        .santa .reindeer.r4 { transform: translateY(0) translateX(0) scale(1); }
+
+        .santa .santa-body {
+            font-size: 1.1em;
+            transform: translateY(-4px);
+            filter: drop-shadow(0 6px 8px rgba(0,0,0,0.6));
+        }
+
+        @keyframes reindeer-gallop {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0); }
         }
 
         @keyframes FlyingSanta {
@@ -1194,7 +1220,7 @@
                 <!-- 2. Static Title (Moves with Photo) -->
                 <div class="title-group">
                     <h1 class="static-title">MERRY CHRISTMAS</h1>
-                    <p class="static-subtitle">A Gift of Joy</p>
+                    <p class="static-subtitle">Tap the Picture for Magic Moment</p>
                 </div>
             </div>
 
