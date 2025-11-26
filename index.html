@@ -513,6 +513,25 @@
             opacity: 1;
         }
 
+        .greeting-text {
+            font-size: 1.1rem;
+            color: var(--light-gray);
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 20px auto;
+            transition: opacity 0.8s ease, max-height 0.8s ease, margin 0.8s ease;
+            max-height: 500px;
+            opacity: 1;
+        }
+
+        .greeting-text p {
+            opacity: 0;
+        }
+
+        .greeting-text p.typing {
+            opacity: 1;
+        }
+
         .content-wrapper.step-3 .greeting-text {
             opacity: 0;
             max-height: 0;
@@ -791,6 +810,86 @@
             cursor: pointer;
         }
 
+        /* Santa Animation */
+        .santa {
+            width: 20vw;
+            min-width: 175px;
+            z-index: 600;
+            cursor: pointer;
+            animation: FlyingSanta 38s infinite linear;
+            bottom: 0%;
+            left: 0%;
+            position: fixed;
+        }
+
+        @keyframes FlyingSanta {
+            25% {
+                bottom: 80%;
+                left: 85%;
+                transform: rotateY(0deg);
+            }
+
+            26% {
+                transform: rotateY(180deg);
+            }
+
+            50% {
+                bottom: 60%;
+                left: 0%;
+                transform: rotateY(180deg);
+            }
+
+            51% {
+                transform: rotateY(0deg);
+            }
+
+            75% {
+                bottom: 40%;
+                left: 85%;
+                transform: rotateY(0deg);
+            }
+
+            76% {
+                bottom: 40%;
+                left: 85%;
+                transform: rotateY(180deg);
+            }
+
+            99% {
+                transform: rotateY(180deg);
+            }
+        }
+
+        /* Festive Snow Animation */
+        #snow {
+            background: none;
+            z-index: 200;
+            background-image: url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/191814/flake1.png"),
+                url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/191814/flake2.png"),
+                url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/191814/flake3.png");
+            height: 100%;
+            left: 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            animation: snow 10s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes snow {
+            0% {
+                background-position: 0px 0px, 0px 0px, 0px 0px;
+            }
+
+            50% {
+                background-position: 500px 500px, 100px 200px, -100px 150px;
+            }
+
+            100% {
+                background-position: 500px 1000px, 200px 400px, -100px 300px;
+            }
+        }
+
         .volume-slider::-moz-range-thumb {
             width: 12px;
             height: 12px;
@@ -839,16 +938,6 @@
             position: absolute;
             top: 20px;
             right: 30px;
-            font-size: 2.5rem;
-            color: var(--gold);
-            cursor: pointer;
-        }
-
-        /* Mobile */
-        @media (max-width: 768px) {
-            body {
-                overflow-y: auto;
-            }
 
             .welcome-text {
                 font-size: 2.5rem;
@@ -1075,6 +1164,11 @@
     <canvas id="starsCanvas"></canvas>
     <canvas id="particlesCanvas"></canvas>
     <canvas id="snowCanvas"></canvas>
+    <!-- Festive Snow Layer -->
+    <div id="snow"></div>
+
+    <!-- Flying Santa -->
+    <img class="santa" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/191814/santas.gif" alt="Santa Be Watchin" />
 
     <!-- Welcome -->
     <div id="welcomeScreen" class="welcome-screen">
@@ -1114,18 +1208,18 @@
                         <p><strong>Merry Christmas, Chris!</strong></p>
 
                         <p>Even though we don't talk very often, I truly appreciate the calm and positive energy you
-                            bring
-                            wherever you go. <br> You have a gentle way of making the atmosphere feel lighter, and it
-                            never goes
-                            unnoticed.<br> Your singing adds a special charm — it's inspiring to see you express your
-                            talent so
-                            quietly yet so beautifully.</p>
-
+                            bring wherever you go.</p>
+                        <p> You have a gentle way of making the atmosphere feel lighter, and it never goes unnoticed.
+                        </p>
+                        <p> Your singing adds a special charm — it's inspiring to see you express your talent so quietly
+                            yet so beautifully.</p>
                         <p>As the Christmas season arrives, I want to send you a heartfelt wish for joy, peace, and
-                            moments that make you smile. <br>May this time surround you with warmth, good memories, and
-                            everything that keeps your heart happy. <br>Keep being the kind, humble person you are, and
-                            may the
-                            coming year bring you more success, inspiration, and <br>beautiful melodies.</p>
+                            moments that make you smile.</p>
+                        <p>May this time surround you with warmth, good memories, and everything that keeps your heart
+                            happy.</p>
+                        <p>Keep being the kind, humble person you are, and may the coming year bring you more success,
+                            inspiration,</p>
+                        <p>and beautiful melodies.</p>
                     </div>
                     <span class="kevin-subtitle">Tap to Open Memories</span>
                 </div>
@@ -1340,15 +1434,53 @@
             });
 
             // 2. Tap Photo -> Both Move Left, Kevin Reveals on Right
+            // photoTrigger.addEventListener('click', (e) => {
+            //     if (!contentWrapper.classList.contains('step-2')) {
+            //         contentWrapper.classList.add('step-2');
+            //         const rect = photoTrigger.getBoundingClientRect();
+            //         createBurst(rect.left + rect.width / 2, rect.top + rect.height / 2);
+            //         e.stopPropagation();
+            //     }
+            // });
+            // 2. Tap Photo -> Both Move Left, Kevin Reveals on Right
             photoTrigger.addEventListener('click', (e) => {
                 if (!contentWrapper.classList.contains('step-2')) {
                     contentWrapper.classList.add('step-2');
                     const rect = photoTrigger.getBoundingClientRect();
                     createBurst(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                    // Start typewriter effect after transition
+                    setTimeout(() => animateGreeting(), 800);
                     e.stopPropagation();
                 }
             });
+            // Typewriter effect function
+            function typeWriter(element, text, speed = 20) {
+                return new Promise((resolve) => {
+                    let i = 0;
+                    element.textContent = '';
+                    element.classList.add('typing');
 
+                    function type() {
+                        if (i < text.length) {
+                            element.textContent += text.charAt(i);
+                            i++;
+                            setTimeout(type, speed);
+                        } else {
+                            resolve();
+                        }
+                    }
+                    type();
+                });
+            }
+
+            async function animateGreeting() {
+                const paragraphs = document.querySelectorAll('.greeting-text p');
+                for (let p of paragraphs) {
+                    const originalText = p.textContent;
+                    await typeWriter(p, originalText, 20);
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+            }
             // 3. Tap KEVIN -> Content Reveals
             kevinTrigger.addEventListener('click', (e) => {
                 if (contentWrapper.classList.contains('step-2') && !contentWrapper.classList.contains('step-3')) {
