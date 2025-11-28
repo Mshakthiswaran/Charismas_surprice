@@ -642,23 +642,17 @@
         .santa {
             z-index: 999; /* Lowered z-index so it doesn't block player */
             cursor: pointer;
-            /* animation: FlyingSanta 38s infinite linear; */ /* Animation disabled */
-            bottom: 10px; /* Fixed position bottom-right */
-            left : 50px; /* Changed from left to right */
+            animation: FlyingSanta 38s infinite linear;
+            bottom: 0%;
+            left: 0%;
             position: fixed;
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 8px;
             pointer-events: none;
-            width: 150px; /* Control actual image width */
-            height: auto;
+            font-size: clamp(20px, 2.5vw, 56px);
         }
-        
-        .santa img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
+
         .santa .reindeer {
             transform-origin: center;
             animation: reindeer-gallop 0.6s ease-in-out infinite;
@@ -675,20 +669,21 @@
             transform: translateY(-4px);
             filter: drop-shadow(0 6px 8px rgba(0,0,0,0.6));
         }
-        /* .santa.stopped {
+        .santa.stopped {
               animation-play-state: paused;
-        } */
+        }
         /* Add this new class to your <style> block */
-        /* .santa.parked {
-         
+        .santa.parked {
+         /* 1. Stop the continuous flying animation completely */
              animation: none !important; 
     
-             bottom: 10px !important; 
-             left: 10px !important; 
+          /* 2. Set the position to the bottom-left corner */
+             bottom: 10px !important; /* Move him slightly up from the very edge */
+             left: 10px !important;  /* Move him slightly right from the very edge */
     
-         
+         /* 3. Reset any transform from the animation */
              transform: none !important;
-         } */
+         }
         @keyframes reindeer-gallop {
             0% { transform: translateY(0); }
             50% { transform: translateY(-8px); }
@@ -1052,14 +1047,19 @@
                     <h1 class="kevin-text">ALLREX_REYVANTH</h1>
                     <div class="greeting-text">
                         <p><strong>Merry Christmas, Chris!</strong></p>
-                        <p> Even though we don't talk very often, I truly appreciate the calm and positive energy you bring wherever you go.
-                        You have a gentle way of making the atmosphere feel lighter, and it never goes unnoticed. Your singing adds a special charm — it's inspiring to see you express your talent so quietly yet so beautifully.
-                        Your singing is a quiet but beautiful gift — it brightens moments and lifts the heart. </p>
-                        <p>This holiday season I hope you enjoy peaceful times, happy memories, and moments that make you smile.</p>
-                        <p>As the Christmas season arrives, I want to send you a heartfelt wish for joy, peace, and moments that make you smile.
-                         May this time of the year surround you with warmth, good memories, and everything that keeps your heart happy.
-                        Keep being the kind, humble person you are, and may the coming year bring you more success, inspiration, and beautiful melodies.</p>
 
+                        <p>Even though we don't talk very often, I truly appreciate the calm and positive energy you bring wherever you go.</p>
+                        <p> You have a gentle way of making the atmosphere feel lighter, and it never goes unnoticed.
+                        </p>
+                        <p> Your singing adds a special charm — it's inspiring to see you express your talent so quietly
+                            yet so beautifully.</p>
+                        <p>As the Christmas season arrives, I want to send you a heartfelt wish for joy, peace, and
+                            moments that make you smile.</p>
+                        <p>May this time surround you with warmth, good memories, and everything that keeps your heart
+                            happy.</p>
+                        <p>Keep being the kind, humble person you are, and may the coming year bring you more success,
+                            inspiration,</p>
+                        <p>and beautiful melodies.</p>
                     </div>
                     <span class="kevin-subtitle">Tap to Open Memories</span>
                 </div>
@@ -1446,24 +1446,26 @@
           // Video
 const santaElement = document.querySelector('.santa'); 
 
-// const parkSanta = () => {
-//     if (santaElement) {
-       
-//         santaElement.style.transform = ''; 
+const parkSanta = () => {
+    if (santaElement) {
+        // Clear any previous inline transform (from the attempt to freeze position)
+        santaElement.style.transform = ''; 
         
-        
-//         santaElement.classList.add('parked'); 
-//     }
-// }
+        // Add the 'parked' class, which stops the animation and moves him to the corner
+        santaElement.classList.add('parked'); 
+    }
+}
 
-// const resumeFlying = () => {
-//     if (santaElement) {
-        
-//         santaElement.classList.remove('parked');
-//     }
-//     modal.classList.remove('active');
-//     modalVideo.pause();
-// }
+const resumeFlying = () => {
+    if (santaElement) {
+        // Remove the 'parked' class. This automatically re-enables the
+        // 'FlyingSanta' animation, which will start from the current (0%, 0%)
+        // position and continue flying across the screen.
+        santaElement.classList.remove('parked');
+    }
+    modal.classList.remove('active');
+    modalVideo.pause();
+}
 
 // 1. OPEN VIDEO: Park Santa
 document.querySelectorAll('.video-item').forEach(v => {
